@@ -1,0 +1,19 @@
+services:
+  mariadb:
+    image: mariadb:10.11
+    container_name: mariadb_nation
+    platform: linux/arm64/v8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: nation
+      MYSQL_USER: nation_user
+      MYSQL_PASSWORD: nation_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      - ./nation.sql:/docker-entrypoint-initdb.d/nation.sql:ro
+
+volumes:
+  mariadb_data:
