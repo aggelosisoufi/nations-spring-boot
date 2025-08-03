@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 @Data
 @AllArgsConstructor
 public class CountryDto {
+    private Long id;
     private String name;
     private BigDecimal area;
     private String countryCode2;

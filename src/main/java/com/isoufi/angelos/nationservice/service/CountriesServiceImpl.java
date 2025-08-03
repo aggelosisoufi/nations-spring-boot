@@ -19,6 +19,7 @@ public class CountriesServiceImpl implements CountriesService {
         return countryRepository.findAllByOrderByNameAsc()
                 .stream()
                 .map(c -> CountryDto.builder()
+                        .id(c.getId())
                         .countryCode2(c.getCode2())
                         .name(c.getName())
                         .area(c.getArea())
