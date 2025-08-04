@@ -4,11 +4,13 @@ import com.isoufi.angelos.nationservice.entity.mariadb.CountryStat;
 import com.isoufi.angelos.nationservice.entity.mariadb.CountryStatId;
 import com.isoufi.angelos.nationservice.projection.CountryMaxGdpProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface CountryStatRepository extends JpaRepository<CountryStat, CountryStatId>{
+public interface CountryStatRepository extends JpaRepository<CountryStat, CountryStatId>,
+        JpaSpecificationExecutor<CountryStat> {
     @Query(value =
             "SELECT c.name AS name, " +
                     "       c.country_code3 AS countryCode3, " +

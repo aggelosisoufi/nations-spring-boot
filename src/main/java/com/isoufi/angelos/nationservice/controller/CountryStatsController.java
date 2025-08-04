@@ -1,6 +1,8 @@
 package com.isoufi.angelos.nationservice.controller;
 
 import com.isoufi.angelos.nationservice.dto.CountryMaxGdpDto;
+import com.isoufi.angelos.nationservice.dto.CountryStatsSearchDto;
+import com.isoufi.angelos.nationservice.filter.CountryStatAdvancedFilter;
 import com.isoufi.angelos.nationservice.service.interfaces.CountryStatsService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -8,12 +10,13 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -52,6 +55,41 @@ public class CountryStatsController {
     @GetMapping("/max-gdp-ratio")
     public ResponseEntity<List<CountryMaxGdpDto>> getMaxGdpPerPopulation() {
         List<CountryMaxGdpDto> results = countryStatsService.getCountriesWithMaxGdpPerPopulation();
+
+        if (results.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(results);
+    }
+
+    @Operation(
+            summary = "Search country statistics with filters",
+            description = "Filter by region, year range, population, and GDP. Supports pagination and sorting."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Paginated list of country stats",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = CountryStatsSearchDto.class),
+                            examples = @ExampleObject(
+                                    value = "{ \"content\": [" +
+                                            "{\"continentName\": \"Europe\", \"regionName\": \"Western Europe\", \"countryName\": \"Germany\", " +
+                                            "\"year\": 2019, \"population\": 83000000, \"gdp\": 3800000000000}]," +
+                                            "\"totalElements\": 1, \"totalPages\": 1, \"size\": 20, \"number\": 0 }"
+                            )
+                    )
+            ),
+            @ApiResponse(responseCode = "204", description = "No matching records found")
+    })
+    @PostMapping("/search")
+    public ResponseEntity<Page<CountryStatsSearchDto>> filter(
+            @RequestBody CountryStatAdvancedFilter filter,
+            Pageable pageable) {
+
+        Page<CountryStatsSearchDto> results = countryStatsService.search(filter, pageable);
 
         if (results.isEmpty()) {
             return ResponseEntity.noContent().build();
